@@ -84,9 +84,9 @@ public class ControlledDelta : Spatial, Positionable
     public bool SetPosition(Vector3 position)
     {
         var maybeSolution = Inverse(position);
-        if (!(maybeSolution is null))
+        if (!(maybeSolution is null) && !(robot is null))
         {
-            var solution = maybeSolution ?? default;
+            var solution = maybeSolution ?? (0, 0, 0);
             robot.axisA = solution.AxisA;
             robot.axisB = solution.AxisB;
             robot.axisC = solution.AxisC;
