@@ -1,0 +1,19 @@
+[remap]
+
+importer="wavefront_obj"
+type="Mesh"
+path="res://.import/forearm.obj-d31a1bda28bb2dc6e52df22678251622.mesh"
+
+[deps]
+
+files=[ "res://.import/forearm.obj-d31a1bda28bb2dc6e52df22678251622.mesh" ]
+
+source_file="res://models/lamp/forearm.obj"
+dest_files=[ "res://.import/forearm.obj-d31a1bda28bb2dc6e52df22678251622.mesh", "res://.import/forearm.obj-d31a1bda28bb2dc6e52df22678251622.mesh" ]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3( 1, 1, 1 )
+offset_mesh=Vector3( 0, 0, 0 )
+optimize_mesh=true

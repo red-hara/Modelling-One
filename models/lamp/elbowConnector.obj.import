@@ -1,0 +1,19 @@
+[remap]
+
+importer="wavefront_obj"
+type="Mesh"
+path="res://.import/elbowConnector.obj-ba1fd90d0b7a21bf36edb8087b0d741c.mesh"
+
+[deps]
+
+files=[ "res://.import/elbowConnector.obj-ba1fd90d0b7a21bf36edb8087b0d741c.mesh" ]
+
+source_file="res://models/lamp/elbowConnector.obj"
+dest_files=[ "res://.import/elbowConnector.obj-ba1fd90d0b7a21bf36edb8087b0d741c.mesh", "res://.import/elbowConnector.obj-ba1fd90d0b7a21bf36edb8087b0d741c.mesh" ]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3( 1, 1, 1 )
+offset_mesh=Vector3( 0, 0, 0 )
+optimize_mesh=true
