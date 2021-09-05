@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://prefab/delta/ControlledDelta.cs" type="Script" id=1]
+[ext_resource path="res://prefab/delta/Delta.tscn" type="PackedScene" id=2]
+
+[node name="ControlledDelta" type="Spatial"]
+script = ExtResource( 1 )
+target = Vector3( 0, -3.05176e-05, -600 )
+deltaPath = NodePath("Delta")
+
+[node name="Delta" parent="." instance=ExtResource( 2 )]
+axisA = -70.9917
+axisB = -70.9917
+axisC = -70.9917
