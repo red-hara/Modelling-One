@@ -4,53 +4,108 @@ using System;
 [Tool]
 public class Delta : Spatial
 {
+
+    // A constant variable "platformRadius" of the float type is created.
     public const float platformRadius = 120;
+
+    // A constant variable "baseRadius" of the float type is created.
     public const float baseRadius = 350;
+
+    // A constant variable "baseLift" of the float type is created.
     public const float baseLift = 50;
+
+    // A constant variable "armLength" of the float type is created.
     public const float armLength = 400;
+
+    // A constant variable "connectorRadius" of the float type is created.
     public const float connectorRadius = 800;
 
+
+
+    // Creating and Adding parameters "AxisA" to "Script Variables".
+    // Float type
     [Export]
     public float axisA;
 
+    // Creating and Adding parameters "AxisB" to "Script Variables".
+    // Float type
     [Export]
     public float axisB;
 
+    // Creating and Adding parameters "AxisC" to "Script Variables".
+    // Float type
     [Export]
     public float axisC;
 
+    // Adding "platformPath" to the "Script Variables", to provide the
+    // robot, which controls the settings of the work.
     [Export]
     public NodePath platformPath;
+
+    // An object of the Spatial type is being created.
     private Spatial platform;
 
+    // Adding "armAPath" to the "Script Variables", to provide the
+    // robot, which controls the settings of the work.
     [Export]
     public NodePath armAPath;
+
+    // An object of the Spatial type is being created.
     private Spatial armA;
 
+    // Adding "armBPath" to the "Script Variables", to provide the
+    // robot, which controls the settings of the work.
     [Export]
     public NodePath armBPath;
+
+    // An object of the Spatial type is being created.
     private Spatial armB;
 
+    // Adding "armCPath" to the "Script Variables", to provide the
+    // robot, which controls the settings of the work.
     [Export]
     public NodePath armCPath;
+
+    // An object of the Spatial type is being created.
     private Spatial armC;
 
+    // Adding "connectorPathAA" to the "Script Variables", to provide the
+    // robot, which controls the settings of the work.
     [Export]
     private NodePath connectorPathAA;
+
+    // Adding "connectorPathAB" to the "Script Variables", to provide the
+    // robot, which controls the settings of the work.
     [Export]
     private NodePath connectorPathAB;
+
+    // Adding "connectorPathAC" to the "Script Variables", to provide the
+    // robot, which controls the settings of the work.
     [Export]
     private NodePath connectorPathBA;
+
+    // Adding "connectorPathBB" to the "Script Variables", to provide the
+    // robot, which controls the settings of the work.
     [Export]
     private NodePath connectorPathBB;
+
+    // Adding "connectorPathCA" to the "Script Variables", to provide the
+    // robot, which controls the settings of the work.
     [Export]
     private NodePath connectorPathCA;
+
+    // Adding "connectorPathCB" to the "Script Variables", to provide the
+    // robot, which controls the settings of the work.
     [Export]
     private NodePath connectorPathCB;
 
+    // An array of Spatial objects is created.
     private Spatial[] connectors;
 
+    // An object of the Vector type is being created.
     private Vector3 position;
+
+    // current flange position.
     public Vector3 Position
     {
         get
@@ -59,6 +114,8 @@ public class Delta : Spatial
         }
     }
 
+    // Function for the possibility of installation "platformPath","armXPath x-A,B,C".
+    // Function for the possibility of installation "ConnectorPath XY:X-A,B,C.Y-A,B,C".
     public override void _Ready()
     {
         platform = GetNode<Spatial>(platformPath);
@@ -76,6 +133,8 @@ public class Delta : Spatial
         };
     }
 
+    // Position setting function.
+    // Accepts the <delta> parameter.
     public override void _Process(float delta)
     {
         armA.RotationDegrees = new Vector3(0.0f, axisA, 0.0f);
@@ -88,6 +147,7 @@ public class Delta : Spatial
         ManageConnectors();
     }
 
+    // Robot connection management function.
     private void ManageConnectors()
     {
         float[] axis = new float[]{
@@ -112,6 +172,7 @@ public class Delta : Spatial
         }
     }
 
+    // Solve forward(direct) kinematics problem.
     private Vector3? Forward()
     {
         float a = Mathf.Deg2Rad(axisA);
@@ -134,6 +195,8 @@ public class Delta : Spatial
         return solution[1];
     }
 
+    // Determine the rotation of the manipulator.
+    // Accepted parameter of <float axis> and <int index>
     private Vector3 ArmPosition(float axis, int index)
     {
         Transform rotationOrigin = new Transform(new Quat(Vector3.Back, Mathf.Deg2Rad(index * 120)), Vector3.Zero) *
@@ -143,6 +206,9 @@ public class Delta : Spatial
         return rotationOrigin.Xform(end);
     }
 
+    // Intersect three spheres.
+    // Accepts parameters of vector types <a,b,c> and float <radius>.
+    // Return array point.
     private static Vector3[] SphereIntersection3(Vector3 a, Vector3 b, Vector3 c, float radius)
     {
         var maybeCircle = SphereIntersection2(a, b, radius);
@@ -165,14 +231,9 @@ public class Delta : Spatial
         };
     }
 
-    public static (Vector3 PositionA, Vector3 PositionB)? SphereCircleIntersection(
-        float radius,
-        Vector3 sphereCenter,
-        Vector3 circleCenter,
-        Vector3 AxisU,
-        Vector3 AxisV,
-        float circleRadius
-    )
+    // The function of calculating the intersection between a sphere and a circle.
+    // Accepts parameters of vector types <sphereCenter, circleCenter, AsixU, AxisV> and float <radius, circleRadius>
+    public static (Vector3 PositionA, Vector3 PositionB)? SphereCircleIntersection(float radius, Vector3 sphereCenter, Vector3 circleCenter, Vector3 AxisU, Vector3 AxisV, float circleRadius)
     {
         var maybeSolution = SphereCircleIntersectionAngles(radius, sphereCenter, circleCenter, AxisU, AxisV, circleRadius);
         if (maybeSolution is null)
@@ -187,6 +248,9 @@ public class Delta : Spatial
         return (positionA, positionB);
     }
 
+    // Intersect three spheres.
+    // Accepts parameters of vector types <a,b> and float <radius>.
+    // Return circle geometry
     public static (float Radius, Vector3 Center, Vector3 AxisV, Vector3 AxisU)? SphereIntersection2(Vector3 a, Vector3 b, float radius)
     {
         Vector3 ab = b - a;
@@ -202,7 +266,8 @@ public class Delta : Spatial
         float circeRadius = Mathf.Sqrt(radius * radius - halfDistance * halfDistance);
         return (circeRadius, center, AxisV, AxisU);
     }
-
+    // Calculate the orthogonal vector.
+    // Accepted parameter <Vector3 vector>
     public static Vector3 OrthogonalVector(Vector3 vector)
     {
         float a = vector.x;
@@ -215,8 +280,9 @@ public class Delta : Spatial
         );
     }
 
-    public static (float SolutionA, float SolutionB)? SphereCircleIntersectionAngles(
-        float radius,
+    // Calculate intersection angles on the provided circle and sphere
+    // Accepts parameters of vector types <sphereCenter, circleCenter, AsixU, AxisV> and float <radius, circleRadius>
+    public static (float SolutionA, float SolutionB)? SphereCircleIntersectionAngles(float radius,
         Vector3 sphereCenter,
         Vector3 circleCenter,
         Vector3 axisU,
@@ -232,6 +298,8 @@ public class Delta : Spatial
         return SolveEquation(alpha, beta, gamma);
     }
 
+    // Solve circle intersection equation.
+    // Accept parameters type of float <alpha, beta, gamma>.
     public static (float SolutionA, float SolutionB)? SolveEquation(float alpha, float beta, float gamma)
     {
         float c = gamma - alpha;
