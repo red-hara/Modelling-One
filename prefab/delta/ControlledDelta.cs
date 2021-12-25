@@ -1,17 +1,25 @@
 using Godot;
 using System;
 
+// A class controlling a delta robot.
+
 [Tool]
 public class ControlledDelta : Spatial, Positionable
 {
+    // Adding "deltaPath" to the "Script Variables", to fix the
+    // robot, which controls the settings of the work.
     [Export]
     public NodePath deltaPath;
+    // An object of the "delta" type is being created.
     private Delta robot;
 
+    // Purpose of the function execution.
+    // GET-Setting the robot's position.SET-The position value is set.
     [Export]
     public Vector3 target
     {
-        get {
+        get
+        {
             return robot.Position;
         }
         set
@@ -20,20 +28,22 @@ public class ControlledDelta : Spatial, Positionable
         }
     }
 
+    // Setting the "Axis Limit Positive".
     [Export]
     public float axisLimitPositive = 10;
+
+    // Setting the "Axis Limit Negative".
     [Export]
     public float axisLimitNegative = -120;
 
+    // Function for the possibility of installation "delta".
     public override void _Ready()
     {
         robot = GetNode<Delta>(deltaPath);
     }
-    public override void _Process(float delta)
-    {
 
-    }
-
+    // Error exclusion function, when going beyond the permissible limits.
+    // Accepts the <target> parameter.
     private (float AxisA, float AxisB, float AxisC)? Inverse(Vector3 target)
     {
         float? a = InverseAxis(target, 0);
@@ -61,6 +71,8 @@ public class ControlledDelta : Spatial, Positionable
         return (axisA, axisB, axisC);
     }
 
+    // Solve inverse kinematics problem for individual axis.
+    // Accepted parameters <Vector3 position> and <int index>
     private static float? InverseAxis(Vector3 position, int index)
     {
         Quat rotation = new Quat(Vector3.Back, Mathf.Pi * 2 / 3 * index);
@@ -81,6 +93,8 @@ public class ControlledDelta : Spatial, Positionable
         return solution.SolutionB;
     }
 
+    // The function of setting the position of the axes of the manipulator.
+    // Accepts the <Vector3 position> parameter.
     public bool SetPosition(Vector3 position)
     {
         var maybeSolution = Inverse(position);
