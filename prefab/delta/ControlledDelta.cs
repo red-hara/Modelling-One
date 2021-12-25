@@ -1,23 +1,26 @@
 using Godot;
-using System;
 
-// A class controlling a delta robot.
-
+/// <summary>Delta-robot controller and inverse kinematics solver.</summary>
 [Tool]
 public class ControlledDelta : Spatial, Positionable
 {
-    // Adding "deltaPath" to the "Script Variables", to fix the
-    // robot, which controls the settings of the work.
-    [Export]
+
+    /// <summary>Path to the controlled delta-robot in the scene
+    /// graph.</summary>
+    [Export] // Exports this field to the editor Inspector.
     public NodePath deltaPath;
-    // An object of the "delta" type is being created.
+
+    /// <summary>An instance of the Delta robot pointed by the
+    /// <c>deltaPath</c>.</summary>
     private Delta robot;
 
-    // Purpose of the function execution.
-    // GET-Setting the robot's position.SET-The position value is set.
+
+    /// <summary>Spatial target to "teleport" the robot to.</summary>
     [Export]
     public Vector3 target
     {
+        // Marks that getting and setting the robot position actions are
+        // performed by various methods.
         get
         {
             return robot.Position;
@@ -28,34 +31,46 @@ public class ControlledDelta : Spatial, Positionable
         }
     }
 
-    // Setting the "Axis Limit Positive".
+    /// <summary>Maximum acceptable positive degree value of controllable robot
+    /// joints.</summary>
     [Export]
     public float axisLimitPositive = 10;
 
-    // Setting the "Axis Limit Negative".
+    /// <summary>Minimum acceptable positive degree value of controllable robot
+    /// joints.</summary>
     [Export]
     public float axisLimitNegative = -120;
 
-    // Function for the possibility of installation "delta".
+    // Ready is called automatically when the object with this script is added
+    // to the scene or the scene is initialized.
     public override void _Ready()
     {
         robot = GetNode<Delta>(deltaPath);
     }
 
-    // Error exclusion function, when going beyond the permissible limits.
-    // Accepts the <target> parameter.
+    /// <summary>Calculate optional inverse kinematics solution for the given
+    /// target.</summary>
+    /// <param name="target">the target position to solve the inverse kinematics
+    /// for.</param>
+    /// <returns>Optional solution tuple</returns>
     private (float AxisA, float AxisB, float AxisC)? Inverse(Vector3 target)
     {
+        // Get solutions for individual axes.
         float? a = InverseAxis(target, 0);
         float? b = InverseAxis(target, 1);
         float? c = InverseAxis(target, 2);
+        // Check that all values are not null, i.e., there are solutions for all
+        // three axes.
         if (a is null || b is null || c is null)
         {
             return null;
         }
-        float axisA = Mathf.Rad2Deg(a ?? default);
-        float axisB = Mathf.Rad2Deg(b ?? default);
-        float axisC = Mathf.Rad2Deg(c ?? default);
+        // Recalculate solution values from radians to degrees, also extract
+        // them from the nullable type.
+        float axisA = Mathf.Rad2Deg(a.Value);
+        float axisB = Mathf.Rad2Deg(b.Value);
+        float axisC = Mathf.Rad2Deg(c.Value);
+        // Check that all values are in proper range.
         if (axisA > axisLimitPositive || axisA < axisLimitNegative)
         {
             return null;
@@ -71,13 +86,22 @@ public class ControlledDelta : Spatial, Positionable
         return (axisA, axisB, axisC);
     }
 
-    // Solve inverse kinematics problem for individual axis.
-    // Accepted parameters <Vector3 position> and <int index>
+    /// <summary>Solve the inverse kinematics problem for an individual
+    /// axis.</summary>
+    /// <param name="position">the target position to solve the inverse
+    /// kinematics for.</param>
+    /// <param name="index">the index of the joint on the robot.<param>
+    /// <returns>The axis value if the <c>target</c> is reachable.</returns>
     private static float? InverseAxis(Vector3 position, int index)
     {
+        // Calculate the joint axis rotation around the Z axis.
         Quat rotation = new Quat(Vector3.Back, Mathf.Pi * 2 / 3 * index);
+        // Set the first circle axis, the vertical one.
         Vector3 axisU = Vector3.Forward;
+        // Set the second circle axis, the horizontal one. It is affected by the
+        // rotation of the joint axis.
         Vector3 axisV = rotation.Xform(Vector3.Left);
+        // Set the circle center in the center of the joint.
         Vector3 circleCenter = rotation.Xform(new Vector3(Delta.baseRadius - Delta.platformRadius, 0, Delta.baseLift));
         float circleRadius = Delta.armLength;
         var maybeSolution = Delta.SphereCircleIntersectionAngles(Delta.connectorRadius, position, circleCenter, axisU, axisV, circleRadius);
@@ -93,8 +117,9 @@ public class ControlledDelta : Spatial, Positionable
         return solution.SolutionB;
     }
 
-    // The function of setting the position of the axes of the manipulator.
-    // Accepts the <Vector3 position> parameter.
+    /// <summary>Set robot spatial position.</summary>
+    /// <param name="position">the target robot position.</param>
+    /// <returns>True if the position setting was successful.</returns>
     public bool SetPosition(Vector3 position)
     {
         var maybeSolution = Inverse(position);
