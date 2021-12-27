@@ -1,13 +1,13 @@
 using Godot;
 
 /// <summary>Delta-robot controller and inverse kinematics solver.</summary>
-[Tool]
+[Tool] // Mark this script to be executed in the editor.
 public class ControlledDelta : Spatial, Positionable
 {
 
     /// <summary>Path to the controlled delta-robot in the scene
     /// graph.</summary>
-    [Export] // Exports this field to the editor Inspector.
+    [Export] // Export this field to the editor Inspector.
     public NodePath deltaPath;
 
     /// <summary>An instance of the Delta robot pointed by the
@@ -52,7 +52,7 @@ public class ControlledDelta : Spatial, Positionable
     /// target.</summary>
     /// <param name="target">the target position to solve the inverse kinematics
     /// for.</param>
-    /// <returns>Optional solution tuple</returns>
+    /// <returns>Optional solution tuple.</returns>
     private (float AxisA, float AxisB, float AxisC)? Inverse(Vector3 target)
     {
         // Get solutions for individual axes.
@@ -94,6 +94,11 @@ public class ControlledDelta : Spatial, Positionable
     /// <returns>The axis value if the <c>target</c> is reachable.</returns>
     private static float? InverseAxis(Vector3 position, int index)
     {
+        // The solution is base on the idea that with fixed platform position
+        // the ends of connectors (grey parts) form sphere. Such sphere has to
+        // intersect with the circles on which the end of arms (black parts) are
+        // located.
+
         // Calculate the joint axis rotation around the Z axis.
         Quat rotation = new Quat(Vector3.Back, Mathf.Pi * 2 / 3 * index);
         // Set the first circle axis, the vertical one.
@@ -102,15 +107,33 @@ public class ControlledDelta : Spatial, Positionable
         // rotation of the joint axis.
         Vector3 axisV = rotation.Xform(Vector3.Left);
         // Set the circle center in the center of the joint.
-        Vector3 circleCenter = rotation.Xform(new Vector3(Delta.baseRadius - Delta.platformRadius, 0, Delta.baseLift));
+        Vector3 circleCenter = rotation.Xform(
+            new Vector3(
+                Delta.baseRadius - Delta.platformRadius,
+                0,
+                Delta.baseLift
+            )
+        );
         float circleRadius = Delta.armLength;
-        var maybeSolution = Delta.SphereCircleIntersectionAngles(Delta.connectorRadius, position, circleCenter, axisU, axisV, circleRadius);
+        var maybeSolution = Delta.SphereCircleIntersectionAngles(
+            Delta.connectorRadius,
+            position,
+            circleCenter,
+            axisU,
+            axisV,
+            circleRadius
+        );
         if (maybeSolution is null)
         {
             return null;
         }
-        var solution = maybeSolution ?? default;
-        if (Mathf.Wrap(solution.SolutionA, -Mathf.Pi, Mathf.Pi) < Mathf.Wrap(solution.SolutionB, -Mathf.Pi, Mathf.Pi))
+        var solution = maybeSolution.Value;
+
+        // Select better solution.
+        if (
+            Mathf.Wrap(solution.SolutionA, -Mathf.Pi, Mathf.Pi) <
+            Mathf.Wrap(solution.SolutionB, -Mathf.Pi, Mathf.Pi)
+        )
         {
             return solution.SolutionA;
         }
