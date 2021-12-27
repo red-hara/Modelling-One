@@ -1,38 +1,47 @@
 using Godot;
-using System;
 
-// Class setting hand position.
+/// <summary>The mover moves any <c>Positionable</c> object.</summary>
 public class Mover : Node
 {
 
-    // Adding offset points (x,y,z) to the "Script Variables" for the position of the manipulator with parallel kinematics.
+    /// <summary>The offset applied to the hard-coded trajectory.</summary>
     [Export]
     public Vector3 offset = new Vector3();
 
-    // Adding a positional path to the "Script Variables" in order to providing the 
-    // manipulator and control its position using coordinates.
+    /// <summary>The path to the positionable in the scene graph.</summary>
     [Export]
     public NodePath positionablePath;
 
-    // A positional object is being created.
+    /// <summary>The positionable object to be controlled.</summary>
     private Positionable positionable;
-    
-    // A variable "counter" of the float type is created.
+
+    /// <summary>Internal counter to measure time from the start.</summary>
     private float counter = 0;
 
-    // Function for the possibility of installation "positionable".
+    // Ready is called automatically when the object with this script is added
+    // to the scene or the scene is initialized.
     public override void _Ready()
     {
-
+        // Set positionable using the path to it.
         positionable = GetNode<Positionable>(positionablePath);
     }
 
-    // The function of the movement of the manipulator around the circle.
-    // Accepts the <delta> parameter, which provides a frame-by-frame image of the movement.
+    // Process is called automatically during every scene graph update. The
+    // delta parameter represents the time passed since the previous update in
+    // seconds.
     public override void _Process(float delta)
     {
+        // Increment the counter;
         counter += delta;
+        // Calculate the rotation radius.
         float radius = 200 * Mathf.Cos(counter / 4);
-        positionable.SetPosition(radius * new Vector3(Mathf.Cos(counter), Mathf.Sin(counter), 0) + offset);
+        // Set the desired position.
+        positionable.SetPosition(
+            radius * new Vector3(
+                Mathf.Cos(counter),
+                Mathf.Sin(counter),
+                0
+            ) + offset
+        );
     }
 }
