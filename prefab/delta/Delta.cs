@@ -153,7 +153,7 @@ public class Delta : Spatial
     }
 
     /// <summary>Update arm connectors to point in the platform
-    /// direction.<summary>
+    /// direction.</summary>
     private void ManageConnectors()
     {
         // Recalculate axes into radian form.
@@ -244,7 +244,7 @@ public class Delta : Spatial
 
     /// <summary>Calculate the arm (black part) end position based on its index
     /// and angle. Note that the calculation is performed as if the platform has
-    /// zero radius and arms are moved closer to the base center.<summary>
+    /// zero radius and arms are moved closer to the base center.</summary>
     /// <param name="axis">the arm rotation in degrees.</param>
     /// <param name="index">the arm index.</param>
     /// <returns>The spatial location of the arm end in relation to the base
@@ -322,7 +322,7 @@ public class Delta : Spatial
     /// <param name="axisU">the first circle axis.</param>
     /// <param name="axisV">the second circle axis.</param>
     /// <param name="circleRadius">the circle radius.</param>
-    /// <returns>The nullable solution tuple.<returns>
+    /// <returns>The nullable solution tuple.</returns>
     public static (Vector3 PositionA, Vector3 PositionB)?
     SphereCircleIntersection(
         float radius,
@@ -422,10 +422,11 @@ public class Delta : Spatial
     /// axisU is 90 degrees.</summary>
     /// <param name="radius">the sphere radius.</param>
     /// <param name="sphereCenter">the sphere center position.</param>
+    /// <param name="circleCenter">the center of the circle.</param>
     /// <param name="axisU">the first circle axis.</param>
     /// <param name="axisV">the second circle axis.</param>
     /// <param name="circleRadius">the circle radius.</param>
-    /// <returns>The nullable solution tuple, in radians.<returns>
+    /// <returns>The nullable solution tuple, in radians.</returns>
     public static (float SolutionA, float SolutionB)?
     SphereCircleIntersectionAngles(
         float radius,

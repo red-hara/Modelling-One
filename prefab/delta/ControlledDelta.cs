@@ -90,7 +90,7 @@ public class ControlledDelta : Spatial, Positionable
     /// axis.</summary>
     /// <param name="position">the target position to solve the inverse
     /// kinematics for.</param>
-    /// <param name="index">the index of the joint on the robot.<param>
+    /// <param name="index">the index of the joint on the robot.</param>
     /// <returns>The axis value if the <c>target</c> is reachable.</returns>
     private static float? InverseAxis(Vector3 position, int index)
     {
